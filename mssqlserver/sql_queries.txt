@@ -1,0 +1,422 @@
+
+Queries - 02-JUN-2023
+=====================
+update products set qoh = 10 
+where prodid = 107
+
+update products set price = 600, qoh = 3 
+where prodid = 101
+
+
+select prodname, price
+from products
+where catcode = 'hd'
+
+
+select stuff('how do you do', 5,2,'did')
+
+// First word from name 
+select prodname, left(prodname, charindex(' ', prodname) - 1)
+from products
+
+
+select datediff(dd,transdate, getdate())
+from sales
+
+select dateadd(mm, 1, '5/31/23')
+
+select dateadd(mm, -2, '5/31/23')
+
+
+select * 
+from products
+where prodname like '_e%'
+
+
+select * 
+from products
+where catcode in ('hd','pr')
+
+
+select * 
+from products
+where price between 1000 and 2000
+
+select catcode, count(*), avg(price)
+from products
+group by catcode 
+
+
+select prodid, datepart(mm, transdate) as Month,  sum(qty) as TotalQty
+from sales
+group by prodid, datepart(mm, transdate)
+
+
+select catcode, count(*) 
+from products
+where price > 1000
+group by CatCode
+order by 2
+
+
+select prodid, sum(qty)
+from  sales
+group by prodid
+having sum(qty) > 5
+
+
+
+select prodid, sum(qty)
+from sales
+group by prodid 
+
+select *
+from sales
+where datediff(dd,transdate, getdate()) <= 300
+
+
+delete from products 
+where prodid = 101
+
+select * from titles
+where price >= 15 and price <= 20
+
+select * from titles
+where price between 15 and 20
+
+select * from titles
+where pub_id = '1389' or pub_id = '0877'
+
+select * from titles
+where pub_id in('1389', '0877')
+
+select * from titles
+where  title like '%Computers%'
+
+
+select * from titles
+where  title like 't%'
+
+
+select * from titles
+order by price desc
+
+select * from titles
+order by pub_id, price desc
+
+
+select * from titles
+where price is not null 
+order by pub_id, price desc
+
+
+select avg(price), max(ytd_sales)
+from titles
+
+
+select avg(price) 
+from titles
+where type='Business'
+
+select title, price, price * 0.90 new_price
+from titles
+
+
+select title, price, price * 0.90 "new price"
+from titles
+
+select distinct price
+from titles
+
+
+select type, avg(price)
+from titles
+group by type
+
+
+select type, avg(price)
+from titles
+where price is not null 
+group by type
+
+
+select type, pub_id, avg(price)
+from titles
+where price is not null 
+group by type, pub_id
+
+
+select type, count(*) book_count
+from titles
+group by type
+order by book_count 
+
+
+select type, count(*) book_count
+from titles
+where price < 15
+group by type
+order by 2 desc
+
+
+select type, max(price)
+from titles
+group by type
+order by 2 desc
+
+
+select type, max(price)
+from titles
+group by type
+having max(price) > 20
+order by 2 desc
+
+ 
+select  left('javaee',4), SUBSTRING('javaee',2,4)
+
+select  charindex('java','Oracle Java EE')
+
+select  REPLICATE('*',10), ltrim('    abc xyz   ')
+
+select  REPLACE('123--33--','--','*')
+
+select  stuff('javaee',1,4,'jakarta ')
+
+select  getdate(), year(getdate()), datepart(dy, getdate())
+
+select year(pubdate), count(*)
+from titles
+group by year(pubdate)
+
+
+---------------------------------------------------------------
+
+05-JUN-2023
+============
+select left(prodname, charindex(' ', prodname + ' ') - 1)
+from products
+
+
+select invno, Transdate, prodname, amount 
+from products p join sales s
+on (p.prodid = s.prodid)
+
+
+select catdesc, prodid, prodname, price
+from products p join categories c
+on (p.catcode = c.catcode)
+where price > 5000
+order by 1
+
+
+select invno, convert(varchar(10), transdate, 103) as TransDate,
+       prodname, catdesc, amount
+from products p join categories c
+on (p.catcode = c.catcode) 
+join sales s on (p.prodid = s.prodid)
+
+
+Column 'products.ProdName' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.
+
+
+select prodname, Total_Sales = sum(amount)  
+from sales s join products p on (p.prodid = s.prodid)
+group by prodname
+having sum(amount) > 10000
+
+
+select prodname, amount 
+from sales s right outer join products p on (p.prodid = s.prodid)
+
+
+select prodname, Count = count(amount)
+from sales s right outer join products p on (p.prodid = s.prodid)
+group by prodname 
+
+select  convert(char(10), getdate(), 103)
+
+select  convert(char(10), getdate(), 103)
+
+select * from sales
+where prodid in
+  (
+    select prodid from products
+    where prodname like '%d%')
+
+
+select * from products 
+where price >
+  ( select avg(price)
+    from products)
+
+
+select catdesc, prodname, qoh, Price
+from products p join categories c on (p.catcode = c.catcode)
+where price >
+  ( select avg(price)
+    from products)
+
+
+select catdesc, prodname, qoh, Price
+from products p join categories c on (p.catcode = c.catcode)
+where prodid in 
+  ( select prodid
+    from  sales
+    group by Prodid
+    having sum(qty) > 5)
+
+
+
+select *
+from authors
+where au_id in (
+  select au_id
+  from titleauthor 
+  where title_id in 
+  (
+      select title_id
+      from titles
+      where pub_id = 
+        (select pub_id
+         from publishers
+         where pub_name = 'New Moon Books'
+        )
+  )
+)
+
+
+Other Examples
+==============
+
+select title, pub_name
+from titles t join publishers p
+on t.pub_id = p.pub_id
+
+
+select title, price, p.pub_id, pub_name, country
+from titles t join publishers p
+on t.pub_id = p.pub_id
+
+
+select title, price, p.pub_id, pub_name, country
+from titles t join publishers p on t.pub_id = p.pub_id
+where price > 20
+
+
+select title, au_fname + ' ' + au_lname author
+from titles t join titleauthor ta on t.title_id = ta.title_id
+ join authors a on ta.au_id = a.au_id
+order by title
+
+
+select au_fname + ' ' + au_lname  author, count(*)
+from titleauthor ta join authors a on ta.au_id = a.au_id
+group by au_fname + ' ' + au_lname
+
+
+select pub_name, title
+from publishers p left outer join  titles t on t.pub_id = p.pub_id
+
+
+select pub_name, count(title)
+from publishers p left outer join titles t on t.pub_id = p.pub_id
+group by pub_name
+
+
+select * from titles where pub_id = 
+   (select pub_id
+    from publishers
+    where pub_name = 'New Moon Books')
+
+
+select * from titles where pub_id in
+   (select pub_id
+    from publishers
+    where country = 'usa')
+
+
+select *
+from publishers
+where pub_id in
+(
+select pub_id
+from titles
+group by pub_id
+having count(*) > 5
+)
+
+
+SELECT SUBSTRING(title + ' ',1,CHARINDEX(' ',title)) AS first_word_title FROM titles
+ 
+select title, left(title, patindex('%[^A-Za-z0-9]%', title) -1)
+from titles
+
+
+
+select pub_name, p.city pub_city, au_fname, a.city au_city, title
+from titles t join publishers p on t.pub_id = p.pub_id
+join titleauthor ta on ta.title_id = t.title_id 
+join authors a on a.au_id = ta.au_id
+where p.city = a.city
+
+
+select * from titles
+where pub_id in 
+  (select pub_id from publishers where country = 'usa')
+  and title_id in 
+  (select title_id from titleauthor 
+                where au_id in 
+                    (select au_id from authors 
+                     where city = 'menlo park')
+  )
+
+
+select * from titles main
+where isnull(price,0) <=
+    (select avg(price)
+     from titles
+     where pub_id = main.pub_id)
+
+
+
+update titles set price = 
+ (select avg(price) from titles)
+where title_id = 'mc3026'
+
+
+create view business_titles
+AS
+select * from titles 
+where type = 'business'
+
+select * from business_titles
+
+
+create view popular_titles
+AS
+select * from titles 
+where type = 'popular_comp'
+
+select * from popular_titles
+
+
+
+create view author_title_count
+AS
+select au_fname, count(title_id) title_count
+from titleauthor ta right outer join authors a on ta.au_id = a.au_id
+group by au_fname 
+
+
+select * from author_title_count
+
+
+
+
+
+
+
+
+
+
+

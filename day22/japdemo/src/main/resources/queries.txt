@@ -1,0 +1,14 @@
+select name from Publisher
+
+select length(name) from Publisher
+
+select title, price from Title
+
+select title, publisher.name from Title
+
+select upper(title) || ' - ' || upper(publisher.name) from Title
+
+select publisher.name, sum(price) from Title group by publisher.name
+
+
+select name from Publisher p where size(p.titles) > 2
